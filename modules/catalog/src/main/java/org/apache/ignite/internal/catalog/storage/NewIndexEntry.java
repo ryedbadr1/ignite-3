@@ -15,41 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.ignite.internal.catalog.descriptors;
+package org.apache.ignite.internal.catalog.storage;
 
+import org.apache.ignite.internal.catalog.descriptors.IndexDescriptor;
 import org.apache.ignite.internal.tostring.S;
 
 /**
- * Index descriptor base class.
+ * Describes addition of a new index.
  */
-public abstract class IndexDescriptor extends ObjectDescriptor {
-    private static final long serialVersionUID = -8045949593661301287L;
+public class NewIndexEntry implements UpdateEntry {
+    private static final long serialVersionUID = 6717363577013237711L;
 
-    /** Table id. */
-    private final int tableId;
+    private final IndexDescriptor descriptor;
 
-    /** Unique constraint flag. */
-    private final boolean unique;
-
-    /** Write only flag. {@code True} when index is building. */
-    private boolean writeOnly;
-
-    IndexDescriptor(int id, String name, int tableId, boolean unique) {
-        super(id, Type.INDEX, name);
-        this.tableId = tableId;
-        this.unique = unique;
+    /**
+     * Constructs the object.
+     *
+     * @param descriptor A descriptor of a index to add.
+     */
+    public NewIndexEntry(IndexDescriptor descriptor) {
+        this.descriptor = descriptor;
     }
 
-    public int tableId() {
-        return tableId;
-    }
-
-    public boolean unique() {
-        return unique;
-    }
-
-    public boolean writeOnly() {
-        return writeOnly;
+    /** Returns descriptor of a index to add. */
+    public IndexDescriptor descriptor() {
+        return descriptor;
     }
 
     /** {@inheritDoc} */

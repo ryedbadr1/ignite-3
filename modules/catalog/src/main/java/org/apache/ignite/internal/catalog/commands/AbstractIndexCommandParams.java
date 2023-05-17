@@ -18,23 +18,26 @@
 package org.apache.ignite.internal.catalog.commands;
 
 /**
- * Abstract table ddl command.
+ * Abstract index ddl command.
  */
-public class AbstractTableCommandParams implements DdlCommandParams {
-    /** Table name. */
-    protected String tableName;
+public class AbstractIndexCommandParams implements DdlCommandParams {
+    /** Index name. */
+    protected String indexName;
 
-    /** Quietly ignore this command if table is not exists. */
-    protected boolean ifTableExists;
-
-    /** Schema name where this new table will be created. */
+    /** Schema name where this new index will be created. */
     protected String schema;
 
+    /** Unique index flag. */
+    protected boolean unique;
+
+    /** Quietly ignore this command if index existence check failed. */
+    protected boolean ifIndexExists;
+
     /**
-     * Returns table simple name.
+     * Returns index simple name.
      */
-    public String tableName() {
-        return tableName;
+    public String indexName() {
+        return indexName;
     }
 
     /**
@@ -45,16 +48,16 @@ public class AbstractTableCommandParams implements DdlCommandParams {
     }
 
     /**
-     * Quietly ignore if table is not exist.
+     * Returns {@code true} if index is unique, {@code false} otherwise.
      */
-    public boolean ifTableExists() {
-        return ifTableExists;
+    public boolean isUnique() {
+        return unique;
     }
 
     /**
      * Parameters builder.
      */
-    protected abstract static class AbstractBuilder<ParamT extends AbstractTableCommandParams, BuilderT> {
+    protected abstract static class AbstractBuilder<ParamT extends AbstractIndexCommandParams, BuilderT> {
         protected ParamT params;
 
         AbstractBuilder(ParamT params) {
@@ -73,23 +76,32 @@ public class AbstractTableCommandParams implements DdlCommandParams {
         }
 
         /**
-         * Sets table simple name.
+         * Sets index simple name.
          *
-         * @param tableName Table simple name.
+         * @param indexName Index simple name.
          * @return {@code this}.
          */
-        public BuilderT tableName(String tableName) {
-            params.tableName = tableName;
+        public BuilderT indexName(String indexName) {
+            params.indexName = indexName;
             return (BuilderT) this;
         }
 
         /**
          * Set quietly ignore flag.
          *
-         * @param ifTableNotExists Flag.
+         * @param ifIndexExists Flag.
          */
-        public BuilderT ifTableExists(boolean ifTableNotExists) {
-            params.ifTableExists = ifTableNotExists;
+        public BuilderT ifIndexExists(boolean ifIndexExists) {
+            params.ifIndexExists = ifIndexExists;
+
+            return (BuilderT) this;
+        }
+
+        /**
+         * Sets unique flag.
+         */
+        public BuilderT unique() {
+            params.unique = true;
 
             return (BuilderT) this;
         }

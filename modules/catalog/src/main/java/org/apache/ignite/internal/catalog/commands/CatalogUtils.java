@@ -17,7 +17,13 @@
 
 package org.apache.ignite.internal.catalog.commands;
 
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.apache.ignite.internal.catalog.descriptors.HashIndexDescriptor;
+import org.apache.ignite.internal.catalog.descriptors.IndexColumnDescriptor;
+import org.apache.ignite.internal.catalog.descriptors.IndexDescriptor;
+import org.apache.ignite.internal.catalog.descriptors.SortedIndexDescriptor;
 import org.apache.ignite.internal.catalog.descriptors.TableColumnDescriptor;
 import org.apache.ignite.internal.catalog.descriptors.TableDescriptor;
 
@@ -39,6 +45,34 @@ public class CatalogUtils {
                 params.primaryKeyColumns(),
                 params.colocationColumns()
         );
+    }
+
+    /**
+     * Converts CreateIndex command params to descriptor.
+     *
+     * @param id Index id.
+     * @param tableId Table id.
+     * @param params Parameters.
+     * @return Index descriptor.
+     */
+    public static IndexDescriptor fromParams(int id, int tableId, CreateIndexParams params) {
+        switch (params.type()) {
+            case HASH:
+                return new HashIndexDescriptor(id,
+                        params.indexName(),
+                        tableId,
+                        params.isUnique(),
+                        params.columns()
+                );
+            case SORTED:
+                List<IndexColumnDescriptor> columnDescriptors = IntStream.range(0, params.collations().size())
+                        .mapToObj(i -> new IndexColumnDescriptor(params.columns().get(i), params.collations().get(i)))
+                        .collect(Collectors.toList());
+                return new SortedIndexDescriptor(id, params.indexName(), tableId, params.isUnique(), columnDescriptors);
+            default:
+                throw new IllegalArgumentException("Unsupported index type: " + params.type());
+        }
+
     }
 
     private static TableColumnDescriptor fromParams(ColumnParams params) {
