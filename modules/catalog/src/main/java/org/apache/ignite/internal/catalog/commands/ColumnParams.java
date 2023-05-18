@@ -17,21 +17,29 @@
 
 package org.apache.ignite.internal.catalog.commands;
 
-import java.io.Serializable;
 import java.util.Objects;
 import org.apache.ignite.sql.ColumnType;
 
 /** Defines a particular column within table. */
-public class ColumnParams implements Serializable {
-    private static final long serialVersionUID = 5602599481844743521L;
+public class ColumnParams {
+    /** Creates parameters builder. */
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    private final String name;
+    /** Column name. */
+    private String name;
 
-    private final ColumnType type;
+    /** Column type. */
+    private ColumnType type;
 
-    private final boolean nullable;
+    /** Nullability flag. */
+    private boolean nullable;
 
-    private final DefaultValue defaultValueDefinition;
+    /** Column default value. */
+    private DefaultValue defaultValueDefinition;
+
+    private ColumnParams() {}
 
     /** Creates a column definition. */
     public ColumnParams(String name, ColumnType type, DefaultValue defaultValueDefinition, boolean nullable) {
@@ -85,5 +93,71 @@ public class ColumnParams implements Serializable {
      */
     public Integer scale() {
         return null;
+    }
+
+    /** Parameters builder. */
+    public static class Builder {
+        private ColumnParams params;
+
+        private Builder() {
+            params = new ColumnParams();
+        }
+
+        /**
+         * Set column simple name.
+         *
+         * @param name Column simple name.
+         * @return {@code this}.
+         */
+        public Builder name(String name) {
+            params.name = name;
+
+            return this;
+        }
+
+        /**
+         * Set column type.
+         *
+         * @param type Column type.
+         * @return {@code this}.
+         */
+        public Builder type(ColumnType type) {
+            params.type = type;
+
+            return this;
+        }
+
+        /**
+         * Marks column as nullable.
+         *
+         * @return {@code this}.
+         */
+        public Builder nullable(boolean nullable) {
+            params.nullable = nullable;
+
+            return this;
+        }
+
+        /**
+         * Sets column default value.
+         *
+         * @return {@code this}.
+         */
+        public Builder defaultValue(DefaultValue defaultValue) {
+            params.defaultValueDefinition = defaultValue;
+
+            return this;
+        }
+
+        /**
+         * Builds parameters.
+         *
+         * @return Parameters.
+         */
+        public ColumnParams build() {
+            ColumnParams params0 = params;
+            params = null;
+            return params0;
+        }
     }
 }

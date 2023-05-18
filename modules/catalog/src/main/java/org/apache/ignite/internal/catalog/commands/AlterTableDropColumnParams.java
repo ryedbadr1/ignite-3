@@ -25,6 +25,10 @@ import java.util.Set;
  */
 @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 public class AlterTableDropColumnParams extends AbstractTableCommandParams {
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /** Quietly ignore this command if column is not exist. */
     private boolean ifColumnExists;
 

@@ -17,11 +17,8 @@
 
 package org.apache.ignite.internal.catalog.commands;
 
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.apache.ignite.internal.catalog.descriptors.HashIndexDescriptor;
-import org.apache.ignite.internal.catalog.descriptors.IndexColumnDescriptor;
 import org.apache.ignite.internal.catalog.descriptors.IndexDescriptor;
 import org.apache.ignite.internal.catalog.descriptors.SortedIndexDescriptor;
 import org.apache.ignite.internal.catalog.descriptors.TableColumnDescriptor;
@@ -61,21 +58,23 @@ public class CatalogUtils {
                 return new HashIndexDescriptor(id,
                         params.indexName(),
                         tableId,
-                        params.isUnique(),
-                        params.columns()
+                        params.columns(), params.isUnique()
                 );
             case SORTED:
-                List<IndexColumnDescriptor> columnDescriptors = IntStream.range(0, params.collations().size())
-                        .mapToObj(i -> new IndexColumnDescriptor(params.columns().get(i), params.collations().get(i)))
-                        .collect(Collectors.toList());
-                return new SortedIndexDescriptor(id, params.indexName(), tableId, params.isUnique(), columnDescriptors);
+                return new SortedIndexDescriptor(id, params.indexName(), tableId, params.isUnique(), params.columns(), params.collations());
             default:
                 throw new IllegalArgumentException("Unsupported index type: " + params.type());
         }
 
     }
 
-    private static TableColumnDescriptor fromParams(ColumnParams params) {
+    /**
+     * Converts AlterTableAdd command columns parameters to column descriptor.
+     *
+     * @param params Parameters.
+     * @return Column descriptor.
+     */
+    public static TableColumnDescriptor fromParams(ColumnParams params) {
         return new TableColumnDescriptor(params.name(), params.type(), params.nullable(), params.defaultValueDefinition());
     }
 }

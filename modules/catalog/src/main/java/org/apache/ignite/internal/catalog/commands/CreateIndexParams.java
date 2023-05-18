@@ -24,6 +24,7 @@ import org.apache.ignite.internal.catalog.descriptors.ColumnCollation;
  * CREATE INDEX statement.
  */
 public class CreateIndexParams extends AbstractIndexCommandParams {
+    /** Creates parameters builder. */
     public static Builder builder() {
         return new Builder();
     }
@@ -36,24 +37,39 @@ public class CreateIndexParams extends AbstractIndexCommandParams {
     /** Table name. */
     private String tableName;
 
-    private Type type;
+    /** Index type. */
+    private Type indexType;
 
+    /** Index columns. */
     private List<String> columns;
 
+    /** Columns collation. */
     private List<ColumnCollation> collations;
 
+    /**
+     * Gets index columns.
+     */
     public List<String> columns() {
         return columns;
     }
 
+    /**
+     * Gets index columns collations.
+     */
     public List<ColumnCollation> collations() {
         return collations;
     }
 
+    /**
+     * Gets index type.
+     */
     public Type type() {
-        return type;
+        return indexType;
     }
 
+    /**
+     * Gets table name.
+     */
     public String tableName() {
         return tableName;
     }
@@ -73,7 +89,7 @@ public class CreateIndexParams extends AbstractIndexCommandParams {
          * @return {@code this}.
          */
         public Builder type(Type type) {
-            params.type = type;
+            params.indexType = type;
 
             return this;
         }
