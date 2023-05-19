@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.apache.ignite.internal.catalog.commands.AlterZoneRenameParams;
 import org.apache.ignite.internal.catalog.commands.ColumnParams;
 import org.apache.ignite.internal.catalog.commands.CreateTableParams;
 import org.apache.ignite.internal.catalog.commands.CreateZoneParams;
@@ -466,6 +467,47 @@ public class CatalogServiceSelfTest {
         // Validate actual catalog
         assertNull(service.zone(ZONE_NAME, System.currentTimeMillis()));
         assertNull(service.zone(1, System.currentTimeMillis()));
+    }
+
+    @Test
+    public void testRenameZone() throws InterruptedException {
+        CreateZoneParams createParams = CreateZoneParams.builder()
+                .zoneName(ZONE_NAME)
+                .partitions(42)
+                .replicas(15)
+                .build();
+        
+        AlterZoneRenameParams renameParams = AlterZoneRenameParams.builder()
+                .zoneName(ZONE_NAME)
+                .newZoneName("RenamedZone")
+                .build();
+
+        assertThat(service.createDistributionZone(createParams), willBe((Object) null));
+
+        long beforeDropTimestamp = System.currentTimeMillis();
+
+        Thread.sleep(5);
+
+        assertThat(service.renameDistributionZone(renameParams), willBe((Object) null));
+
+        // Validate catalog version from the past.
+        DistributionZoneDescriptor zone = service.zone(ZONE_NAME, beforeDropTimestamp);
+
+        assertNotNull(zone);
+        assertEquals(ZONE_NAME, zone.name());
+        assertEquals(1, zone.id());
+
+        assertSame(zone, service.zone(1, beforeDropTimestamp));
+
+        // Validate actual catalog
+        zone = service.zone("RenamedZone", System.currentTimeMillis());
+
+        assertNotNull(zone);
+        assertNull(service.zone(ZONE_NAME, System.currentTimeMillis()));
+        assertEquals("RenamedZone", zone.name());
+        assertEquals(1, zone.id());
+
+        assertSame(zone, service.zone(1, System.currentTimeMillis()));
     }
 
     @Test
