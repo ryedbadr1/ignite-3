@@ -476,7 +476,7 @@ public class CatalogServiceSelfTest {
                 .partitions(42)
                 .replicas(15)
                 .build();
-        
+
         AlterZoneRenameParams renameParams = AlterZoneRenameParams.builder()
                 .zoneName(ZONE_NAME)
                 .newZoneName("RenamedZone")
