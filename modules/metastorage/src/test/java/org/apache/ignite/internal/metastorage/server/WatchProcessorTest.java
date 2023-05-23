@@ -115,23 +115,27 @@ public class WatchProcessorTest {
         var entry1 = new EntryImpl("foo".getBytes(UTF_8), null, 1, 0);
         var entry2 = new EntryImpl("bar".getBytes(UTF_8), null, 2, 0);
 
-        watchProcessor.notifyWatches(List.of(entry1), HybridTimestamp.MAX_VALUE);
+        HybridTimestamp ts = new HybridTimestamp(1, 2);
+
+        watchProcessor.notifyWatches(List.of(entry1), ts);
 
         var event = new WatchEvent(new EntryEvent(oldEntry(entry1), entry1));
 
         verify(listener1, timeout(1_000)).onUpdate(event);
         verify(listener2, timeout(1_000)).onRevisionUpdated(1);
 
-        verify(revisionCallback, timeout(1_000)).onRevisionApplied(event, any());
+        verify(revisionCallback, timeout(1_000)).onRevisionApplied(event, ts);
 
-        watchProcessor.notifyWatches(List.of(entry2), HybridTimestamp.MAX_VALUE);
+        ts = new HybridTimestamp(2, 3);
+
+        watchProcessor.notifyWatches(List.of(entry2), ts);
 
         event = new WatchEvent(new EntryEvent(oldEntry(entry2), entry2));
 
         verify(listener1, timeout(1_000)).onRevisionUpdated(2);
         verify(listener2, timeout(1_000)).onUpdate(event);
 
-        verify(revisionCallback, timeout(1_000)).onRevisionApplied(event, any());
+        verify(revisionCallback, timeout(1_000)).onRevisionApplied(event, ts);
     }
 
     /**
